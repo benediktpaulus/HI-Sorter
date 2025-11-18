@@ -1,6 +1,8 @@
 # HI-Sorter
 🚀 HI-Sorter: Blazing-fast photo triage, powered by your intelligence, not AI. 100% local, no cloud.
 
+![HI-Sorter Screenshot](pic/2025-11-18_20h29_19.png)
+
 What it does
 - Lets you rapidly sort photos into a year-based folder tree (Parent/YYYY/...).
 - Designed for fast manual triage: keyboard-first, local-only, no AI.
@@ -24,10 +26,12 @@ Why it's fast
 Quick usage
 - Start the app (`main.exe`) or run `python main.py` if running from source.
 - Choose an Unsorted folder (source) and a Parent folder (destination library).
-- The app shows the current image. Press 1–9 (or click a folder) to move it into the mapped destination.
+- The app shows the current image.
+- Create a folder, or click on the folder you want to sort the picture into → a hotkey will be assigned.
+- To sort into the same folder again, press 1–9 (or click the folder) to move the image into the mapped destination.
 - Press Delete (Entf) to send an image to the session trash (safe, undoable). Use "Undo Last Move" to restore.
-- Destination folders are auto-grouped by year (EXIF DateTimeOriginal, fallback to file modification time).
-- Use the theme toggle in the header to switch between light and dark modes at any time.
+- Destination folders are auto-grouped by year (EXIF `DateTimeOriginal`, fallback to file modification time).
+- Use the preview to select all photos you want to sort at once; when you are ready to sort into a folder, click the folder or press its hotkey.
 
 Where session trash is stored
 - Deleted files go to a `trash` folder inside your chosen Parent folder (i.e. `{Parent}\trash`). Restores handle name conflicts by appending "(restored)".
@@ -64,4 +68,4 @@ How to contribute
 3. Open a pull request with a brief description of the problem and your solution.
 
 Found a bug or want to request a feature?
-- Open an issue with reproduction steps and expected behavior. If you can, fix it :D 
+- Open an issue with reproduction steps and expected behavior. Or better -> directly fix it.
