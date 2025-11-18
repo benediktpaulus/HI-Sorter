@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header class="app-header">
+        <h1>Picture Sorter</h1>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-live="polite" aria-pressed="false">
+            <span class="theme-toggle__icon" aria-hidden="true">🌙</span>
+            <span class="theme-toggle__label">Dark mode</span>
+        </button>
+    </header>
     <div class="container">
         <div class="panel left-panel">
             <div class="tree" id="folder-tree">

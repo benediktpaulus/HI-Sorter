@@ -1,3 +1,73 @@
+const THEME_STORAGE_KEY = 'pictureSorterTheme';
+const rootElement = document.documentElement;
+const prefersDarkScheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || (prefersDarkScheme ? 'dark' : 'light');
+
+function setThemeAttribute(theme) {
+    currentTheme = theme;
+    if (rootElement) {
+        rootElement.setAttribute('data-theme', theme);
+    }
+}
+
+function persistTheme(theme) {
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (_) {
+        /* no-op if storage blocked */
+    }
+}
+
+function updateThemeToggleControl(theme) {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+    const icon = toggle.querySelector('.theme-toggle__icon');
+    const label = toggle.querySelector('.theme-toggle__label');
+    const nextThemeLabel = theme === 'dark' ? 'Light mode' : 'Dark mode';
+    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (label) label.textContent = nextThemeLabel;
+    toggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    toggle.setAttribute('title', `Switch to ${nextThemeLabel}`);
+}
+
+function setTheme(theme, { persist = true } = {}) {
+    setThemeAttribute(theme);
+    if (persist) persistTheme(theme);
+    updateThemeToggleControl(theme);
+}
+
+function toggleTheme() {
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+}
+
+setThemeAttribute(currentTheme);
+
+function initThemeToggle() {
+    updateThemeToggleControl(currentTheme);
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) {
+        toggle.addEventListener('click', toggleTheme);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeToggle);
+} else {
+    initThemeToggle();
+}
+
+if (window.matchMedia) {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    if (media?.addEventListener) {
+        media.addEventListener('change', (event) => {
+            const storedChoice = localStorage.getItem(THEME_STORAGE_KEY);
+            if (storedChoice) return; // user preference overrides system changes
+            setTheme(event.matches ? 'dark' : 'light', { persist: false });
+        });
+    }
+}
+
 window.addEventListener('pywebviewready', function () {
     const ui = {
         unsortedBtn: document.getElementById('select-unsorted-btn'),
@@ -131,7 +201,7 @@ window.addEventListener('pywebviewready', function () {
             badge.className = 'folder-hotkey-badge';
             badge.textContent = key;
             badge.style.marginLeft = '4px';
-            badge.style.color = '#6c757d';
+            badge.style.color = 'var(--color-hotkey-muted)';
             span.appendChild(badge);
         });
         renderHotkeyLegend();
@@ -152,7 +222,7 @@ window.addEventListener('pywebviewready', function () {
         const entf_function = document.createElement('div');
         entf_function.textContent = '(Delete key = "Entf" on keyboards)'; 
         entf_function.style.fontSize = '12px';
-        entf_function.style.color = '#777';
+        entf_function.style.color = 'var(--color-hotkey-muted)';
         legend.appendChild(title);
         legend.appendChild(entf_function);
 
@@ -160,7 +230,7 @@ window.addEventListener('pywebviewready', function () {
         if (slots.length === 0) {
             const empty = document.createElement('div');
             empty.style.fontSize = '12px';
-            empty.style.color = '#777';
+            empty.style.color = 'var(--color-hotkey-muted)';
             empty.textContent = 'Press 1–9 (click folders to assign)';
             legend.appendChild(empty);
             return;
