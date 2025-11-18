@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Picture Sorter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <!-- Make sure this path is correct for your project -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="panel left-panel">
+            <div class="tree" id="folder-tree">
+                <h3>Destination Folders</h3>
+            </div>
+        </div>
+
+        <div class="panel right-panel">
+            <div class="folder-selectors">
+                <h3>1. Select Folders</h3>
+                <div class="selector-row">
+                    <button id="select-unsorted-btn">Unsorted Folder</button>
+                    <p class="folder-path" id="unsorted-path">...</p>
+                </div>
+                <div class="selector-row">
+                    <button id="select-parent-btn" disabled>Parent Folder</button>
+                    <p class="folder-path" id="parent-path">...</p>
+                </div>
+            </div>
+            
+            <h3>2. Review & Sort</h3>
+
+            <!-- This wrapper is essential for the side-by-side layout -->
+            <div class="image-and-preview-wrapper">
+
+                <!-- The main image container -->
+                <div class="image-container" id="image-container">
+                    <span>Image Preview</span>
+                    <div id="image-counter"></div>
+                </div>
+
+                <!-- The preview panel sidebar -->
+                <div class="preview-panel">
+                    <h4>Up Next</h4>
+                    <div class="selection-indicator" id="selection-indicator"></div>
+                    <div class="preview-images-container" id="preview-images-container">
+
+                    </div>
+                </div>
+
+            </div> <!-- end of wrapper -->
+
+
+            <div class="action-buttons">
+                <button id="delete-btn">Delete</button>
+                <button id="undo-btn" disabled>Undo Last Move</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay and other elements -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Make sure this path is correct for your project -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

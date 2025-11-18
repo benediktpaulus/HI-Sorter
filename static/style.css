@@ -1,0 +1,375 @@
+/* Ensure the page never exceeds the viewport height due to outer spacing */
+html, body { height: 100%; }
+
+body {
+    font-family: sans-serif;
+    margin: 0; /* avoid adding to 100vh and causing scroll */
+    padding: clamp(12px, 1.5vmin, 24px); /* keep the same visual spacing */
+    background-color: #f4f4f9;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Fill the full viewport height */
+    box-sizing: border-box; /* include padding inside the 100vh */
+}
+
+/* Make descendants inherit border-box to avoid layout surprises */
+*, *::before, *::after { box-sizing: inherit; }
+.container {
+    display: flex;
+    gap: clamp(10px, 1.5vmin, 24px);
+    flex-grow: 1;
+    /* Add this to prevent the container from shrinking below its content's minimum size */
+    min-height: 0;
+}
+
+/* --- Panels --- */
+.panel {
+    background: white;
+    padding: clamp(12px, 1.6vmin, 22px);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevent flex panels from overflowing */
+}
+.panel.left-panel {
+    /* Responsive left panel: 24–36% of width */
+    flex: 0 0 clamp(240px, 28vw, 36%);
+}
+.panel.right-panel {
+    flex: 1;
+    /* Allow nested flex children to manage their own scroll */
+    min-height: 0;
+}
+
+/* --- General UI Elements --- */
+button {
+    padding: clamp(8px, 1.2vmin, 12px) clamp(10px, 1.6vmin, 16px);
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: clamp(6px, 1vmin, 12px);
+    width: 25vmin;
+}
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+h3 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: clamp(4px, 0.6vmin, 8px);
+    margin-top: 0;
+}
+#image-counter {
+    position: absolute;
+    top: clamp(6px, 1vmin, 12px);
+    left: clamp(6px, 1vmin, 12px);
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: clamp(3px, 0.7vmin, 6px) clamp(6px, 1vmin, 10px);
+    border-radius: 12px;
+    font-size: clamp(11px, 1.1vmin, 14px);
+    z-index: 10; /* Ensure it's above the image */
+}
+
+/* --- Folder Selection --- */
+.folder-selectors {
+    margin-bottom: clamp(10px, 1.5vmin, 16px);
+    border-bottom: 1px solid #eee;
+    padding-bottom: clamp(10px, 1.5vmin, 16px);
+}
+.selector-row {
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1.2vmin, 14px);
+    margin-bottom: clamp(6px, 1vmin, 12px);
+}
+.selector-row button {
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+.folder-path {
+    background: #eee;
+    padding: clamp(6px, 1vmin, 10px);
+    border-radius: 4px;
+    word-break: break-all;
+    margin: 0 10px;
+    min-height: 20px;
+    flex-grow: 1;
+    font-size: clamp(12px, 1.2vmin, 14px);
+}
+
+/* --- Left Panel Folder Tree --- */
+.tree {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.tree ul, .tree li {
+    list-style: none; /* remove bullets */
+    margin: 0;
+    padding: 0;
+}
+.tree ul ul {
+    margin-left: 14px; /* indent only nested subfolder lists */
+}
+.tree summary {
+    list-style-position: inside;
+    position: relative; /* for right-side arrow */
+    display: block;
+    padding-right: 20px; /* space for chevron */
+    cursor: pointer;
+}
+/* Right-side custom chevron for expandable items */
+.tree summary::after {
+    content: '▸';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 160ms ease;
+    color: #666;
+    font-size: 25px;
+}
+.tree details[open] > summary::after {
+    transform: translateY(-50%) rotate(90deg);
+}
+/* hide default disclosure markers in most browsers */
+.tree summary::-webkit-details-marker { display: none; }
+.tree summary::marker { content: ''; }
+.tree .folder-text {
+    cursor: pointer;
+    color: #0056b3;
+    padding-left: 5px;
+}
+.tree .folder-text:hover {
+    text-decoration: underline;
+}
+
+/* --- CORRECTED IMAGE AND PREVIEW LAYOUT --- */
+
+/* This wrapper enables the side-by-side layout and makes it fill available vertical space */
+.image-and-preview-wrapper {
+    display: flex;
+    flex-grow: 1; /* This is key: it makes the area grow vertically */
+    gap: clamp(10px, 1.4vmin, 18px);
+    margin-top: clamp(8px, 1.2vmin, 14px);
+    margin-bottom: clamp(10px, 1.4vmin, 18px);
+    min-height: 0; /* A critical property for nested flex layouts */
+}
+
+/* Main image container */
+.image-container {
+    flex: 1; /* It will take up the available horizontal space */
+    min-width: 0; /* Prevents large images from breaking the layout */
+    background: #e9e9e9;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden; /* Clip any content to container bounds */
+    min-height: 0;
+}
+
+/* The main image itself */
+.image-container img {
+    /* These rules ensure the image fits inside the container without distortion */
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Preview sidebar */
+.preview-panel {
+    width: clamp(110px, 10vw, 220px);
+    flex-shrink: 0; /* Prevent the sidebar from shrinking */
+    border-left: 1px solid #ddd;
+    padding-left: clamp(10px, 1.2vmin, 16px);
+    display: flex;
+    flex-direction: column;
+    /* Clip any hover-zoom overflow inside the panel */
+    overflow: hidden;
+}
+.preview-panel h4 {
+    margin: 0 0 10px 0;
+    color: #555;
+    font-size: clamp(12px, 1.2vmin, 14px);
+    font-weight: bold;
+}
+.selection-indicator {
+    font-size: clamp(11px, 1.1vmin, 13px);
+    color: #3b5bdb;
+    margin-bottom: 8px;
+    min-height: 16px;
+}
+.preview-images-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    /* Grow to fill the panel and scroll internally */
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px; /* room for scrollbar */
+}
+.preview-image {
+    height: clamp(70px, 8vmin, 140px);
+    width: clamp(70px, 8vmin, 140px);
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.preview-image:hover {
+    transform: scale(1.12);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+/* Selected range styling */
+.preview-image.selected {
+    outline: 3px solid #3b5bdb;
+    outline-offset: 0;
+    box-shadow: 0 0 0 2px rgba(59,91,219,0.25);
+}
+
+/* --- Action Buttons (Delete, Undo) --- */
+.action-buttons {
+    display: flex;
+    gap: clamp(8px, 1.2vmin, 14px);
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+#delete-btn {
+    background-color: #dc3545;
+}
+
+/* --- Loading Spinner --- */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+.loading-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+.spinner {
+    width: clamp(32px, 5vmin, 60px);
+    height: clamp(32px, 5vmin, 60px);
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* --- Hotkey Legend --- */
+#hotkey-legend {
+    position: fixed;
+    top: clamp(8px, 1.5vmin, 16px);
+    right: clamp(8px, 1.5vmin, 16px);
+    background: #ffffff;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding: clamp(8px, 1.2vmin, 12px) clamp(10px, 1.5vmin, 14px);
+    min-width: clamp(200px, 22vmin, 300px);
+    z-index: 900;
+    color: #222;
+}
+#hotkey-legend.hidden { display: none; }
+#hotkey-legend .legend-title {
+    font-weight: 600;
+    font-size: clamp(12px, 1.2vmin, 14px);
+    color: #444;
+    margin-bottom: 8px;
+}
+#hotkey-legend .hotkey-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 12px;
+}
+#hotkey-legend .hotkey-item {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+#hotkey-legend .hotkey-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(16px, 2vmin, 22px);
+    height: clamp(16px, 2vmin, 22px);
+    border-radius: 6px;
+    background: #f0f3ff;
+    color: #3b5bdb;
+    font-weight: 700;
+    font-size: clamp(10px, 1.1vmin, 12px);
+    margin-right: 8px;
+}
+#hotkey-legend .hotkey-name {
+    font-size: clamp(10px, 1.1vmin, 12px);
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* --- Folder Action Icon Buttons (+, Trash) --- */
+.folder-actions {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+.icon-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: clamp(16px, 2vmin, 20px);
+    height: clamp(16px, 2vmin, 20px);
+    font-size: clamp(10px, 1.2vmin, 12px);
+    line-height: clamp(16px, 2vmin, 20px);
+    color: #555;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease;
+}
+.icon-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: #111;
+}
+.icon-btn:focus-visible {
+    outline: 2px solid #2684ff;
+    outline-offset: 2px;
+}
+.icon-btn--danger {
+    color: #c23b3b;
+    font-weight: 700; /* bold X */
+}
+.icon-btn--danger:hover {
+    background: rgba(194, 59, 59, 0.12);
+    color: #a51f1f;
+}
+#folder-tree h3 + .icon-btn {
+    margin-left: 2px;
+    transform: translateY(1px);
+}
